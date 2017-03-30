@@ -410,6 +410,8 @@ router.delete('/uploads/:fileName', function(req, res){
 
 router.post('/userdata', function(req, res){
 
+  console.dir(req.body);
+
   const helix = req.body.helix;
   const segments = req.body.segments;
   const panels = req.body.panels;
@@ -421,48 +423,55 @@ router.post('/userdata', function(req, res){
     return;
   }
 
-  for ( var i=0, len = segments.length; i < len; i++ ) {
+  if (segments) {
 
-    const newSeg = new Segments({
-      owner: req.decoded.username,
-      uuid: req.body.segments[i]["uuid"],
-      type: "segment",
-      options: req.body.segments[i]["o"], // Strigyfied options of panel
-      added: now
-    });
+    for ( var i=0, len = segments.length; i < len; i++ ) {
 
-    newSeg.save( function(err) { if ( err ) throw err; });
+      const newSeg = new Segments({
+        owner: req.decoded.username,
+        uuid: req.body.segments[i]["uuid"],
+        type: "segment",
+        options: req.body.segments[i]["o"], // Strigyfied options of panel
+        added: now
+      });
 
-  }
+      newSeg.save( function(err) { if ( err ) throw err; });
 
-  for ( var i=0, len = panels.length; i < len; i++ ) {
-
-    const newPanel = new Panels({
-      owner: req.decoded.username,
-      uuid: req.body.panels[i]["uuid"],
-      type: "panel",
-      options: req.body.panels[i]["o"], // Strigyfied options of panel
-      added: now
-    });
-
-    newPanel.save( function(err) { if ( err ) throw err; });
+    }
 
   }
 
-  for ( var i=0, len = helix.length; i < len; i++ ) {
+  if (panels) {
+    for ( var i=0, len = panels.length; i < len; i++ ) {
 
-    const newHelix = new Helix({
-      owner: req.decoded.username,
-      uuid: req.body.helix[i]["uuid"],
-      type: "helix",
-      options: req.body.helix[i]["o"], // Strigyfied options of panel
-      added: now
-    });
+      const newPanel = new Panels({
+        owner: req.decoded.username,
+        uuid: req.body.panels[i]["uuid"],
+        type: "panel",
+        options: JSON.stringify(req.body.panels[i]["o"]), // Strigyfied options of panel
+        added: now
+      });
 
-    newHelix.save( function(err) { if ( err ) throw err; });
+      newPanel.save( function(err) { if ( err ) throw err; });
 
+    }
   }
 
+  if (helix) {
+    for ( var i=0, len = helix.length; i < len; i++ ) {
+
+      const newHelix = new Helix({
+        owner: req.decoded.username,
+        uuid: req.body.helix[i]["uuid"],
+        type: "helix",
+        options: req.body.helix[i]["o"], // Strigyfied options of panel
+        added: now
+      });
+
+      newHelix.save( function(err) { if ( err ) throw err; });
+
+    }
+  }
   return res.json({ success: true, message: 'Data saved' });
   return;
 
